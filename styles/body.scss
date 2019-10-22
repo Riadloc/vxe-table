@@ -51,6 +51,21 @@
     }
     &.col--selected {
       background-color: #fff;
+      position: relative;
+      &.col--edit::after {
+        content: '复制整列';
+        position: absolute;
+        bottom: -36px;
+        height: 36px;
+        line-height: 36px;
+        right: 0;
+        border: 1px solid #eee;
+        padding: 0 12px;
+        border-radius: 2px;
+        pointer-events: auto;
+        cursor: pointer;
+        background: #fff;
+      }
     }
   }
 }

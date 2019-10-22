@@ -127,6 +127,21 @@ function renderColumn (h, _vm, $table, $seq, seq, fixedType, rowLevel, row, rowI
     (treeConfig.trigger === 'row' || (column.treeNode && treeConfig.trigger === 'cell'))) {
     tdOns.click = evnt => {
       $table.triggerCellClickEvent(evnt, { $table, row, rowIndex, $rowIndex, column, columnIndex, $columnIndex, fixed: fixedType, isHidden: fixedHiddenColumn, level: rowLevel, cell: evnt.currentTarget })
+      if (mouseConfig.selected) {
+        const target = evnt.currentTarget
+        if (target.classList.contains('col--selected')) {
+          const { layerY } = evnt
+          const { height } = target.getBoundingClientRect()
+          if (layerY > height) {
+            const { selected } = editStore
+            const { column, row } = selected
+            const value = row[column.property]
+            tableData.forEach(row => {
+              UtilTools.setCellValue(row, column, value)
+            })
+          }
+        }
+      }
     }
   }
   // 双击事件处理
