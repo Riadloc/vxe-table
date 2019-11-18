@@ -70,11 +70,19 @@ function renderColumn (h, _vm, $table, $seq, seq, fixedType, rowLevel, row, rowI
   let isDirty
   let tdOns = {}
   let cellAlign = align || allAlign
-  let validError = validStore.row === row && validStore.column === column
+  validStore = Object.assign({
+    visible: false,
+    row: null,
+    column: null,
+    content: '',
+    rule: null
+  }, validStore[`${column.property}_${row._XID}`])
+  let validError = validStore.visible
   let hasDefaultTip = editRules && (validOpts.message === 'default' ? (height || tableData.length > 1) : validOpts.message === 'inline')
   let attrs = { 'data-colid': column.id }
   let triggerDblclick = (editRender && editConfig && editConfig.trigger === 'dblclick')
   let params = { $table, $seq, seq, row, rowIndex, $rowIndex, column, columnIndex, $columnIndex, fixed: fixedType, isHidden: fixedHiddenColumn, level: rowLevel, data: tableData }
+  const isLastRow = rowIndex === tableData.length - 1
   // 在 v3.0 中废弃 selectConfig
   let checkboxConfig = $table.checkboxConfig || $table.selectConfig || {}
   // 滚动的渲染不支持动态行高
@@ -132,7 +140,7 @@ function renderColumn (h, _vm, $table, $seq, seq, fixedType, rowLevel, row, rowI
         if (target.classList.contains('col--selected')) {
           const { layerY } = evnt
           const { height } = target.getBoundingClientRect()
-          if (layerY > height) {
+          if (layerY > height || layerY < 0) {
             const { selected } = editStore
             const { column, row } = selected
             const value = row[column.property]
@@ -163,16 +171,18 @@ function renderColumn (h, _vm, $table, $seq, seq, fixedType, rowLevel, row, rowI
   if (!fixedHiddenColumn && editConfig && editConfig.showStatus) {
     isDirty = $table.hasRowChange(row, column.property)
   }
+  const isActived = editConfig && editRender && (actived.row === row && (actived.column === column || editConfig.mode === 'row'))
   return h('td', {
     class: ['vxe-body--column', column.id, {
       [`col--${cellAlign}`]: cellAlign,
       'col--edit': editRender,
       'col--index': column.type === 'index',
       'col--ellipsis': hasEllipsis,
+      'row--last': isLastRow,
       'edit--visible': editRender && editRender.type === 'visible',
       'fixed--hidden': fixedHiddenColumn,
       'col--dirty': isDirty,
-      'col--actived': editConfig && editRender && (actived.row === row && (actived.column === column || editConfig.mode === 'row')),
+      'col--actived': isActived,
       'col--valid-error': validError
     }, UtilTools.getClass(className, params), UtilTools.getClass(cellClassName, params)],
     key: columnKey ? column.id : columnIndex,
@@ -189,7 +199,7 @@ function renderColumn (h, _vm, $table, $seq, seq, fixedType, rowLevel, row, rowI
         title: showTitle ? UtilTools.getCellLabel(row, column, params) : null
       }
     }, column.renderCell(h, params)),
-    hasDefaultTip ? validError ? h('div', {
+    hasDefaultTip ? validError && isActived ? h('div', {
       class: 'vxe-cell--valid',
       style: validStore.rule && validStore.rule.width ? {
         width: `${validStore.rule.width}px`

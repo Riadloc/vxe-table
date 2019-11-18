@@ -2289,12 +2289,14 @@ const Methods = {
           let rowIndex = tableData.indexOf(row)
           let cell = DomTools.getCell(this, { row, rowIndex, column })
           if (cell) {
+            const key = `${column.property}_${row._XID}`
+            validStore = validStore[key]
             return this.validCellRules(type, row, column, cellValue)
               .then(() => {
                 if (customVal && validStore.visible) {
                   UtilTools.setCellValue(row, column, cellValue)
                 }
-                this.clearValidate()
+                this.clearValidate(key)
               })
               .catch(({ rule }) => {
                 if (customVal) {

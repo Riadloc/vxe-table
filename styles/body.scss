@@ -53,18 +53,27 @@
       background-color: #fff;
       position: relative;
       &.col--edit::after {
-        content: '复制整列';
+        content: '复制至整列';
         position: absolute;
         bottom: -36px;
         height: 36px;
         line-height: 36px;
-        right: 0;
+        left: 0;
         border: 1px solid #eee;
-        padding: 0 12px;
+        padding: 0 8px;
         border-radius: 2px;
         pointer-events: auto;
         cursor: pointer;
         background: #fff;
+        box-shadow: 1px 1px 8px #aaa;
+        min-width: 88px;
+      }
+      &.col--edit.row--last::after {
+        top: -36px;
+        bottom: initial;
+      }
+      &.col--edit:not(.col--selected):hover {
+        border-left: 1px dashed #409eff;
       }
     }
   }

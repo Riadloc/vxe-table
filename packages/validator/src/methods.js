@@ -41,6 +41,23 @@ export default {
       .then(() => this.showValidTooltip(params))
   },
   /**
+   * 设置所有错误的cell
+   */
+  setAllValidError (errMap) {
+    this.$nextTick(() => {
+      Object.values(errMap).flat(1).forEach(({ row, column, rule, content }) => {
+        const key = `${column.property}_${row._XID}`
+        this.$set(this.validStore, key, {
+          row,
+          column,
+          rule,
+          content,
+          visible: true
+        })
+      })
+    })
+  },
+  /**
    * 对表格数据进行校验
    * 如果传 row 指定行记录，则只验证传入的行
    * 如果传 rows 为多行记录，则只验证传入的行
@@ -104,6 +121,7 @@ export default {
         }
       }).catch(params => {
         let args = isAll ? validRest : { [params.column.property]: params }
+        this.setAllValidError(args)
         return new Promise((resolve, reject) => {
           let finish = () => {
             params.cell = DomTools.getCell(this, params)
@@ -213,15 +231,17 @@ export default {
       }
     })
   },
-  _clearValidate () {
+  _clearValidate (key) {
     let validTip = this.$refs.validTip
-    Object.assign(this.validStore, {
-      visible: false,
-      row: null,
-      column: null,
-      content: '',
-      rule: null
-    })
+    if (key) {
+      this.$set(this.validStore, key, {
+        visible: false,
+        row: null,
+        column: null,
+        content: '',
+        rule: null
+      })
+    }
     if (validTip && validTip.visible) {
       validTip.close()
     }
@@ -235,11 +255,13 @@ export default {
     let { actived } = editStore
     if (actived.row && editRules) {
       let { row, column, cell } = actived.args
+      const key = `${column.property}_${row._XID}`
+      validStore = validStore[key]
       if (this.hasCellRules(type, row, column)) {
         return this.validCellRules(type, row, column).then(() => {
           if (editConfig.mode === 'row') {
             if (validStore.visible && validStore.row === row && validStore.column === column) {
-              this.clearValidate()
+              this.clearValidate(key)
             }
           }
         }).catch(({ rule }) => {
@@ -264,7 +286,8 @@ export default {
     let validTip = $refs.validTip
     let content = rule.message
     this.$nextTick(() => {
-      Object.assign(this.validStore, {
+      const key = `${column.property}_${row._XID}`
+      this.$set(this.validStore, key, {
         row,
         column,
         rule,

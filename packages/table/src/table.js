@@ -301,14 +301,7 @@ export default {
         removeList: []
       },
       // 存放数据校验相关信息
-      validStore: {
-        visible: false,
-        row: null,
-        column: null,
-        content: '',
-        rule: null,
-        isArrow: false
-      }
+      validStore: {}
     }
   },
   computed: {
