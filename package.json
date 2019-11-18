@@ -93,6 +93,10 @@
   "publishConfig": {
     "registry": "http://repo.ipampas.net/repository/npm-private/"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Riadloc/vxe-table.git"
+  },
   "keywords": [
     "vxe-table",
     "vxe-editable",
@@ -101,7 +105,7 @@
     "vue excel"
   ],
   "author": {
-    "name": "Xu Liangzhan",
+    "name": "Xu Liangzhan, Qiyu",
     "email": "xu_liangzhan@163.com"
   },
   "license": "MIT",
